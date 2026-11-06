@@ -225,16 +225,17 @@ quiz:{q:'Заявок на покупку намного больше, чем н
 quiz:{q:'Купил по 100 ₽, сейчас 90 ₽, ты не продавал. Ты потерял деньги?',o:['Да, окончательно','Пока это бумажный убыток, он фиксируется при продаже','Нет, это всегда прибыль'],ok:1,h:'Что меняется в твоём кошельке в момент, когда ты нажимаешь «Продать»?'}}];
 const T=a=>Array.isArray(a)?a[G.age>=1?1:0]:a;
 function setQ(on,ph){quizMode=on;const i=$('#q');i.placeholder=ph||(on?'Напиши свой ответ…':'Спросить ИИ-наставника…');if(on)i.focus()}
+const SKB='<button class="b g" data-skip=1>Пропустить урок ⏭</button>';
 function tut(force){if(vmsg&&!force)return;const m=$('#tm'),b=$('#tb');b.innerHTML='';setQ(false);$('#prog').innerHTML=[1,2,3,4,5,6].map(i=>`<i class="${i<G.lesson?'on':i==G.lesson?'cur':''}"></i>`).join('');const k=G.lesson+':'+G.step+':'+(G.age===null);if(k!=aiKey){aiKey=k;aiMove()}
 if(G.age===null){m.textContent='Привет! Я наставник фермы. Сколько тебе лет? Подстрою объяснения.';[['14–17',0],['18–21',1],['22–25',2]].forEach(([n,v])=>b.insertAdjacentHTML('beforeend',`<button class=b data-a=${v}>${n}</button>`));return}
 if(G.lesson==0){G.lesson=1;save()}
 const l=L[G.lesson];if(!l){m.textContent='🎉 Все уроки пройдены! Теперь ты можешь свободно играть. Наводи курсор на акции и отвечай на мои вопросы сам, а я не буду говорить, что покупать.';return}
 const h=`Урок ${G.lesson} из 6: ${l.n}\n\n`;
-if(G.step<l.steps.length){m.textContent=h+T(l.steps[G.step]);b.innerHTML='<button class=b data-n=1>Дальше</button>';return}
-if(l.task&&!G.done[l.task]){m.textContent=h+l.tt;return}
-if(!G.quiz[G.lesson]){const q=l.quiz;m.textContent=h+'❓ '+q.q+'\n\n(ответь своими словами)';b.innerHTML='<button class="b g" data-ask=1>Хочу спросить ИИ</button>';setQ(true);return}
+if(G.step<l.steps.length){m.textContent=h+T(l.steps[G.step]);b.innerHTML='<button class=b data-n=1>Дальше</button>'+SKB;return}
+if(l.task&&!G.done[l.task]){m.textContent=h+l.tt;b.innerHTML=SKB;return}
+if(!G.quiz[G.lesson]){const q=l.quiz;m.textContent=h+'❓ '+q.q+'\n\n(ответь своими словами)';b.innerHTML='<button class="b g" data-ask=1>Хочу спросить ИИ</button>'+SKB;setQ(true);return}
 G.lesson++;G.step=0;save();updNav();tut()}
-$('#tb').onclick=e=>{const d=e.target.dataset;if(d.a!==undefined){G.age=+d.a;save();tut()}else if(d.n){G.step++;save();tut()}else if(d.ask){setQ(false);$('#q').focus()}else if(d.n2){vmsg=0;tut(true);aiMove()}};
+$('#tb').onclick=e=>{const d=e.target.dataset;if(d.a!==undefined){G.age=+d.a;save();tut()}else if(d.n){G.step++;save();tut()}else if(d.ask){setQ(false);$('#q').focus()}else if(d.skip){G.lesson++;G.step=0;save();updNav();vmsg=0;tut(true);aiMove()}else if(d.n2){vmsg=0;tut(true);aiMove()}};
 const KW=[null,/совладел|доля|долю|часть|владел|собственник|кусочек/i,/корзин|риск|упад|сильно|потер|разнообраз|диверс|убыт/i,/друг\S* банк|все банки|весь сектор|остальн|сосед|сектор|отрасл|тоже/i,/расти|раст|вырос|рост|поднял|вверх|подорож/i,/спрос|вверх|вырас|рост|покупател|подорож/i,/бумажн|не фиксир|пока не прода|не потерял|пока нет|не окончательно|при продаже|нереализ/i];
 let tries=0;
 async function checkAns(){const a=($('#q').value||'').trim(),q=L[G.lesson].quiz;if(a.length<3){$('#tm').textContent='Напиши ответ своими словами (хотя бы пару слов).';return}
