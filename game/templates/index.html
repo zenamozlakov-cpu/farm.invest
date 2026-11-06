@@ -375,8 +375,6 @@ function qs(s){const c=chg(s),o=G.pos[s.t],a=[];
 a.push(Math.abs(c)>.012?`Цена ${c>0?'выросла':'упала'} на ${(Math.abs(c)*100).toFixed(1)}%. Была ли недавно новость про эту компанию или её отрасль?`:'Цена почти стоит на месте. Почему, по-твоему, так бывает?');
 a.push(`А что делают соседи по зданию «${BLD[bOf(s)].n}»? Двигаются ли они так же?`);
 if(o)a.push(`Ты купил(а) по ${fm(o.avg)} ₽, сейчас ${fm(s.p)} ₽. Это уже результат или пока цифра на экране?`);else a.push('Чего ты ждёшь от этой акции и на чём основано твоё ожидание?');return a}
-document.addEventListener('mouseover',e=>{const d=e.target.closest('[data-t]');const h=$('#hint');if(!d||e.target.closest('.pop')){h.style.display='none';return}
-h.innerHTML='<b>🤔 Подумай:</b><br>'+qs(get(d.dataset.t)).map(x=>'• '+x).join('<br>');h.style.display='block';const r=d.getBoundingClientRect();h.style.left=Math.max(4,Math.min(r.left-250,innerWidth-250))+'px';h.style.top=Math.max(4,Math.min(r.top,innerHeight-h.offsetHeight-8))+'px'});
 /* ---------- список и карточка ---------- */
 function spark(s){const h=s.h.slice(-24),mn=Math.min(...h),mx=Math.max(...h),up=h[h.length-1]>=h[0];return`<polyline fill="none" stroke="${up?'#26a69a':'#ef5350'}" stroke-width="1.8" stroke-linejoin="round" points="${h.map((v,i)=>(i*60/23).toFixed(1)+','+(22-(v-mn)/(mx-mn||1)*20).toFixed(1)).join(' ')}"/>`}
 function tabsHtml(){const btn=x=>`<button class="b ${x.t==cur?'':'g'}${G.pos[x.t]?' own':''}" data-c=${x.t}>${G.pos[x.t]?'● ':''}${x.t}</button>`,cn=get(cur);
