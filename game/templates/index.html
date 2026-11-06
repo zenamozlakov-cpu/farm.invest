@@ -229,7 +229,7 @@ const SKB='<button class="b g" data-skip=1>Пропустить урок ⏭</bu
 function tut(force){if(vmsg&&!force)return;const m=$('#tm'),b=$('#tb');b.innerHTML='';setQ(false);$('#prog').innerHTML=[1,2,3,4,5,6].map(i=>`<i class="${i<G.lesson?'on':i==G.lesson?'cur':''}"></i>`).join('');const k=G.lesson+':'+G.step+':'+(G.age===null);if(k!=aiKey){aiKey=k;aiMove()}
 if(G.age===null){m.textContent='Привет! Я наставник фермы. Сколько тебе лет? Подстрою объяснения.';[['14–17',0],['18–21',1],['22–25',2]].forEach(([n,v])=>b.insertAdjacentHTML('beforeend',`<button class=b data-a=${v}>${n}</button>`));return}
 if(G.lesson==0){G.lesson=1;save()}
-const l=L[G.lesson];if(!l){m.textContent='🎉 Все уроки пройдены! Теперь ты можешь свободно играть. Наводи курсор на акции и отвечай на мои вопросы сам, а я не буду говорить, что покупать.';return}
+const l=L[G.lesson];if(!l){if(G.done.fin){m.textContent='';return}m.textContent='🎉 Все уроки пройдены! Теперь ты можешь свободно играть. Наводи курсор на акции и отвечай на мои вопросы сам, а я не буду говорить, что покупать.';if(!window.__fin)window.__fin=setTimeout(()=>{window.__fin=0;G.done.fin=1;save();if(!L[G.lesson]){$('#tm').textContent='';if(!vmsg&&$('#co').style.display!='block')$('#tut').style.display='none'}},4000);return}
 const h=`Урок ${G.lesson} из 6: ${l.n}\n\n`;
 if(G.step<l.steps.length){m.textContent=h+T(l.steps[G.step]);b.innerHTML='<button class=b data-n=1>Дальше</button>'+SKB;return}
 if(l.task&&!G.done[l.task]){m.textContent=h+l.tt;b.innerHTML=SKB;return}
