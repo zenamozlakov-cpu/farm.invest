@@ -125,6 +125,11 @@ aside{background:linear-gradient(180deg,#1a212c,#131921);border:1px solid rgba(2
 #bkd{width:100%;height:96px;display:block}
 .tp{display:grid;grid-template-columns:1fr 1fr .7fr 1fr;font-size:12px;padding:2px 0;font-variant-numeric:tabular-nums}.tp span:first-child{color:var(--mu)}.tp span:last-child{text-align:right}.tp b{font-weight:600}
 .bkrs{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px solid #222b38}.bkrs span{color:var(--mu)}.bkw2{font-size:13px;color:var(--dn)}
+.nfh{display:flex;justify-content:space-between;align-items:baseline;margin:6px 4px 8px}.nfh small{color:var(--mu);font-size:11px}
+#nf{margin-top:6px;border-top:1px solid rgba(255,255,255,.07);padding-top:6px}
+.nfi{font-size:12px;line-height:1.35;padding:7px 9px;margin:0 0 7px;background:rgba(255,255,255,.04);border-radius:10px;border-left:3px solid var(--mu);animation:nfin .5s}
+.nfi.g{border-left-color:var(--up)}.nfi.r{border-left-color:var(--dn)}.nfi div{margin-bottom:2px;color:var(--mu)}.nfi div b{color:var(--tx)}.nfi.g span{color:var(--up)}.nfi.r span{color:var(--dn)}
+@keyframes nfin{from{opacity:0;transform:translateY(-6px)}}
 </style></head><body>
 <aside class="nav" id="nav"><div class="brand"><span>🌱</span>Инвест-<br>ферма</div><button data-v="farm" class="on"><span class=ic>🚜</span>ферма</button><button data-v="chart"><span class=ic>📈</span>график</button><button data-v="book"><span class=ic>📚</span>стакан</button></aside>
 <section id="main">
@@ -132,7 +137,7 @@ aside{background:linear-gradient(180deg,#1a212c,#131921);border:1px solid rgba(2
 <button id="aishow" title="Показать наставника">🤖</button><div id="ai"><div id="tut"><div id="th"><b>🌱 Фёрми · наставник</b><div id="prog"></div></div><div id="tm"></div><div class="chips" id="tb"></div><div id="co"></div><div class="qr"><input id="q" placeholder="Спросить ИИ-наставника…"><button class="b" id="go">▶</button></div></div><button id="orb" title="Фёрми: потяни, чтобы переместить"><svg viewBox="0 0 64 64" width="64" height="64"><defs><radialGradient id="g1" cx=".35" cy=".3"><stop offset="0" stop-color="#fff7b0"/><stop offset=".6" stop-color="#ffdd2d"/><stop offset="1" stop-color="#d49b00"/></radialGradient></defs><line x1="32" y1="8" x2="32" y2="14" stroke="#d49b00" stroke-width="3"/><circle cx="32" cy="6" r="4" fill="#7CFC9A"/><circle cx="32" cy="37" r="25" fill="url(#g1)"/><rect x="14" y="27" width="36" height="21" rx="10.5" fill="#1b2230"/><g id="eyes"><circle cx="25" cy="37" r="5" fill="#fff"/><circle cx="39" cy="37" r="5" fill="#fff"/><circle id="pl" cx="25" cy="37" r="2.4" fill="#111"/><circle id="pr2" cx="39" cy="37" r="2.4" fill="#111"/></g><path d="M27 44q5 4 10 0" stroke="#7CFC9A" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>
 </section>
 <aside><div class=ah><b>Рынок акций</b><small>учебные данные</small></div><div id="list"></div>
-<p style="color:var(--mu);font-size:11px">Названия и логотипы выдуманы, цены близки к рыночным. Рубли виртуальные.</p></aside>
+<p style="color:var(--mu);font-size:11px">Названия и логотипы выдуманы, цены близки к рыночным. Рубли виртуальные.</p><div id=nf></div></aside>
 <div id="hint" style="display:none"></div>
 <script>
 const $=s=>document.querySelector(s),fm=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
@@ -156,6 +161,54 @@ const SGOOD=['Сектор «{n}»: государство снизило нал
 function makeNews(){const good=Math.random()<.5,r=a=>a[Math.random()*a.length|0];let txt,tg;
 if(Math.random()<.65){const s=r(S);tg=[s];txt=r(good?GOOD:BAD).replace('{n}',s.n)}else{const k=r(Object.keys(PEN));tg=S.filter(s=>s.sec==k);txt=r(good?SGOOD:SBAD).replace('{n}',k)}
 tg.forEach(s=>{s.imp+=good?.004:-.003;s.news={txt,good,ts:Date.now()};s.ev.push({i:s.C.length-1,good,txt})});lastNews=Date.now();G.done.news=1;save();drawList();coach('news',tg);tut()}
+/* ---------- лента выдуманных новостей ---------- */
+const FN=[
+[['ZLBK'],0,.03,'ЗелБанк обанкротился: лицензия отозвана, вкладчики штурмуют отделения'],
+[['ZLBK'],0,.012,'В ЗелБанке сбой: клиенты двое суток не могли снять деньги'],
+[['ZLBK'],1,.012,'ЗелБанк удвоил квартальную прибыль и выплатит больше дивидендов'],
+[['ZLBK'],1,.02,'Крупный инвестор купил 10% акций ЗелБанка'],
+[['VLGT'],0,.025,'Главный склад ВолгаТорга сгорел, магазины пустуют'],
+[['VLGT'],0,.01,'ВолгаТорг закрывает 40 магазинов из-за убытков'],
+[['VLGT'],1,.015,'ВолгаТорг открыл 200 новых магазинов и привлёк миллион клиентов'],
+[['VLGT'],1,.01,'Покупатели полюбили доставку ВолгаТорга: продажи выросли на треть'],
+[['GZPM'],0,.03,'Авария на главной скважине ГазПромысла: добыча остановлена'],
+[['GZPM'],0,.01,'ГазПромысл потерял крупного покупателя газа'],
+[['GZPM'],1,.02,'ГазПромысл нашёл огромное месторождение'],
+[['GZPM'],1,.01,'Цены на газ выросли, ГазПромысл повысил прогноз прибыли'],
+[['LKNF'],0,.025,'ЛукНефть разлила нефть в море: огромный штраф и скандал'],
+[['LKNF'],0,.01,'Ураган остановил нефтяные платформы ЛукНефти'],
+[['LKNF'],1,.02,'ЛукНефть подписала контракт на 10 лет с крупнейшим покупателем'],
+[['LKNF'],1,.01,'ЛукНефть объявила рекордные дивиденды'],
+[['RSNF'],0,.02,'Руководство РусьНефти уличили в обмане акционеров'],
+[['RSNF'],0,.01,'Нефтепровод РусьНефти закрыт на ремонт на месяц'],
+[['RSNF'],1,.02,'РусьНефть запустила завод по переработке и вдвое увеличила выручку'],
+[['RSNF'],1,.01,'РусьНефть сократила долги быстрее плана'],
+[['POIS'],0,.03,'Хакеры взломали Поиск.ру: утекли данные миллионов пользователей'],
+[['POIS'],0,.01,'Поиск.ру проиграл суд и заплатит крупный штраф'],
+[['POIS'],1,.025,'Поиск.ру представил умного помощника, его скачали 5 миллионов раз'],
+[['POIS'],1,.012,'Реклама в Поиск.ру подорожала: выручка компании растёт'],
+[['MBTL'],0,.025,'Сеть МобиТела упала по всей стране на сутки'],
+[['MBTL'],0,.01,'МобиТел теряет абонентов: конкуренты предложили тариф дешевле'],
+[['MBTL'],1,.02,'МобиТел первым запустил сверхбыстрый интернет в 50 городах'],
+[['MBTL'],1,.01,'МобиТел подписал выгодное соглашение с производителем телефонов'],
+[['NRDM'],0,.03,'Шахта НордМеталла обрушилась, работа остановлена'],
+[['NRDM'],0,.01,'Рабочие НордМеталла объявили забастовку'],
+[['NRDM'],1,.02,'НордМеталл нашёл редкий металл, на него огромный спрос'],
+[['NRDM'],1,.012,'Цены на металл выросли, НордМеталл увеличил выпуск'],
+[['ZLBK','VLGT'],0,.012,'Центробанк ужесточил правила: банки и магазины с кредитами под давлением'],
+[['ZLBK','VLGT'],1,.01,'Ставки по кредитам снизились, люди берут больше кредитов и тратят'],
+[['GZPM','LKNF','RSNF'],0,.012,'Цены на нефть и газ резко упали'],
+[['GZPM','LKNF','RSNF'],1,.012,'Мир ищет топливо: нефть и газ дорожают'],
+[['POIS','MBTL'],1,.01,'Государство поддержит технологические компании льготами'],
+[['POIS','MBTL'],0,.01,'Новый закон ограничил доходы технологических компаний']];
+let FEED=[],lastFN=-1;
+function fmtHM(t){const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function drawFeed(){const e=$('#nf');if(!e)return;e.innerHTML='<div class=nfh><b>📰 Новости рынка</b><small>выдуманные</small></div>'+(FEED.length?FEED.map(f=>`<div class="nfi ${f.good?'g':'r'}"><div><b>${f.tg.join(', ')}</b> <span>${f.good?'▲':'▼'}</span> <small>${fmtHM(f.ts)}</small></div>${f.txt}</div>`).join(''):'<small style="color:var(--mu)">Первая новость скоро появится. Новости выходят в случайное время, до 5 минут между ними.</small>')}
+function feedNews(){let i;do{i=Math.random()*FN.length|0}while(i==lastFN&&FN.length>1);lastFN=i;const[tk,g,m,txt]=FN[i],good=!!g,tg=tk.map(get).filter(Boolean);
+tg.forEach(s=>{s.imp+=(good?1:-1)*m*(.85+Math.random()*.3);s.news={txt,good,ts:Date.now()};s.ev.push({i:s.C.length-1,good,txt})});
+FEED.unshift({tg:tk,good,txt,ts:Date.now()});if(FEED.length>8)FEED.length=8;drawFeed();drawList();if(G.age!==null)coach('news',tg)}
+function nextFeed(){setTimeout(()=>{feedNews();nextFeed()},15000+Math.random()*285000)}
+setTimeout(()=>{feedNews()},12000);nextFeed();drawFeed();
 /* ---------- обучение ---------- */
 const L=[null,
 {n:'Что такое акция',steps:[['Акция — это крошечный кусочек компании. Купил акцию — стал совладельцем, как будто у тебя есть доля в магазине друзей.','Акция — долевая ценная бумага: владелец получает долю в компании и право на часть прибыли (дивиденды) и рост стоимости.'],'Справа список компаний. На ферме каждая купленная акция растёт арбузом в загоне своей отрасли. Денег у тебя пока нет, зато есть арбузная грядка: срезай арбузы секатором и продавай, так ты заработаешь стартовый капитал.'],task:null,
