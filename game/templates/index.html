@@ -130,23 +130,35 @@ aside{background:linear-gradient(180deg,#1a212c,#131921);border:1px solid rgba(2
 .nfi{font-size:12px;line-height:1.35;padding:7px 9px;margin:0 0 7px;background:rgba(255,255,255,.04);border-radius:10px;border-left:3px solid var(--mu);animation:nfin .5s}
 .nfi.g{border-left-color:var(--up)}.nfi.r{border-left-color:var(--dn)}.nfi div{margin-bottom:2px;color:var(--mu)}.nfi div b{color:var(--tx)}.nfi.g span{color:var(--up)}.nfi.r span{color:var(--dn)}
 @keyframes nfin{from{opacity:0;transform:translateY(-6px)}}
+aside{display:flex;flex-direction:column;overflow:hidden}aside #list{flex:1 1 auto;min-height:120px;overflow:auto;padding-right:2px}aside>p,aside #nf{flex-shrink:0}aside #nf{max-height:150px;overflow:auto}
+#mtab{display:flex;gap:6px;margin:2px 2px 8px}#mtab button{flex:1;background:var(--bg);color:var(--mu);border:1px solid #2c3645;border-radius:10px;padding:6px 4px;cursor:pointer;font-size:12px;font-weight:600}#mtab button.on{background:var(--ac);color:#000;border-color:var(--ac)}
+#ms{display:none;margin:0 2px 8px;width:calc(100% - 4px);box-sizing:border-box;background:var(--bg);color:var(--tx);border:1px solid #2c3645;border-radius:10px;padding:7px 10px;font-size:13px}
+.lh{position:sticky;top:0;z-index:2;background:#161c26;color:var(--mu);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:7px 6px 5px;margin-top:4px;display:flex;justify-content:space-between}
+.tabs select.more{background:var(--bg);color:var(--tx);border:1px solid var(--mu);border-radius:12px;padding:2px 6px;font-size:12px;max-width:170px}
 </style></head><body>
 <aside class="nav" id="nav"><div class="brand"><span>🌱</span>Инвест-<br>ферма</div><button data-v="farm" class="on"><span class=ic>🚜</span>ферма</button><button data-v="chart"><span class=ic>📈</span>график</button><button data-v="book"><span class=ic>📚</span>стакан</button></aside>
 <section id="main">
 <div id="hud"></div><div id="stage"></div>
 <button id="aishow" title="Показать наставника">🤖</button><div id="ai"><div id="tut"><div id="th"><b>🌱 Фёрми · наставник</b><div id="prog"></div></div><div id="tm"></div><div class="chips" id="tb"></div><div id="co"></div><div class="qr"><input id="q" placeholder="Спросить ИИ-наставника…"><button class="b" id="go">▶</button></div></div><button id="orb" title="Фёрми: потяни, чтобы переместить"><svg viewBox="0 0 64 64" width="64" height="64"><defs><radialGradient id="g1" cx=".35" cy=".3"><stop offset="0" stop-color="#fff7b0"/><stop offset=".6" stop-color="#ffdd2d"/><stop offset="1" stop-color="#d49b00"/></radialGradient></defs><line x1="32" y1="8" x2="32" y2="14" stroke="#d49b00" stroke-width="3"/><circle cx="32" cy="6" r="4" fill="#7CFC9A"/><circle cx="32" cy="37" r="25" fill="url(#g1)"/><rect x="14" y="27" width="36" height="21" rx="10.5" fill="#1b2230"/><g id="eyes"><circle cx="25" cy="37" r="5" fill="#fff"/><circle cx="39" cy="37" r="5" fill="#fff"/><circle id="pl" cx="25" cy="37" r="2.4" fill="#111"/><circle id="pr2" cx="39" cy="37" r="2.4" fill="#111"/></g><path d="M27 44q5 4 10 0" stroke="#7CFC9A" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>
 </section>
-<aside><div class=ah><b>Рынок акций</b><small>учебные данные</small></div><div id="list"></div>
-<p style="color:var(--mu);font-size:11px">Названия и логотипы выдуманы, цены близки к рыночным. Рубли виртуальные.</p><div id=nf></div></aside>
+<aside><div class=ah><b>Рынок</b><small>учебные данные</small></div><div id=mtab><button data-m=pop class=on>⭐ Популярные</button><button data-m=all>Все активы</button></div><input id=ms placeholder="Поиск: тикер или название" autocomplete=off><div id="list"></div>
+<p style="color:var(--mu);font-size:11px">Названия и логотипы выдуманы, цены учебные. Рубли виртуальные.</p><div id=nf></div></aside>
 <div id="hint" style="display:none"></div>
 <script>
 const $=s=>document.querySelector(s),fm=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
 const PEN={'Банки':[3,14,30,36,'🏦'],'Нефть и газ':[36,12,36,38,'⛽'],'Технологии':[3,56,30,36,'💻'],'Металлы':[36,56,26,36,'⚒️']};
-const S=[['ZLBK','ЗелБанк','Банки',310,'#1fa35b'],['VLGT','ВолгаТорг','Банки',80,'#2d6cdf'],['GZPM','ГазПромысел','Нефть и газ',128,'#3aa0e0'],['LKNF','ЛукНефть','Нефть и газ',7100,'#d63b3b'],['RSNF','РусьНефть','Нефть и газ',430,'#e0a020'],['POIS','Поиск.ру','Технологии',4200,'#a03de0'],['MBTL','МобиТел','Технологии',230,'#e03d7a'],['NRDM','НордМеталл','Металлы',135,'#7a8794']]
-.map(([t,n,sec,p,c])=>{const L=12000,C=[],HI=[],LO=[],V=[],vb=Math.round(5e4+Math.random()*5e5),ph=Math.random()*6,gs=()=>Math.random()+Math.random()+Math.random()-1.5;let x=p;
-for(let i=0;i<L;i++){const o=x,sg=.0016*(.6+.8*Math.abs(Math.sin(i/700+ph)));x=o*(1+gs()*sg*2+(p-o)/p*.0002);C.push(x);HI.push(Math.max(o,x)*(1+Math.random()*.0012));LO.push(Math.min(o,x)*(1-Math.random()*.0012));V.push(Math.round(vb*(.5+Math.random())*(1+Math.abs(x/o-1)*300)))}
+const S=[['ZLBK','ЗелБанк','Банки',310,'#1fa35b'],['VLGT','ВолгаТорг','Банки',80,'#2d6cdf'],['GZPM','ГазПромысел','Нефть и газ',128,'#3aa0e0'],['LKNF','ЛукНефть','Нефть и газ',7100,'#d63b3b'],['RSNF','РусьНефть','Нефть и газ',430,'#e0a020'],['POIS','Поиск.ру','Технологии',4200,'#a03de0'],['MBTL','МобиТел','Технологии',230,'#e03d7a'],['NRDM','НордМеталл','Металлы',135,'#7a8794'],
+['BNKV','БанкВолга','Банки',190,'#1b8f8f'],['SIBK','СибБанк','Банки',45,'#4f7a2a'],['ARKT','АрктикГаз','Нефть и газ',1850,'#3d6fd6'],['TATN','ТатНедра','Нефть и газ',640,'#b5562b'],
+['CLDS','ОблакоСофт','Технологии',3100,'#4a5de0'],['SEMI','МикроЧип','Технологии',95,'#2fa7a0'],['GAME','ИгроМир','Технологии',520,'#c4399b'],
+['ALRS','АлмазТрест','Металлы',78,'#5aa7d6'],['ZLTP','ЗолотоПром','Металлы',1650,'#d4a52a'],['STLM','СтальМост','Металлы',1200,'#6b7a86'],
+['BTM','БитМонета','Технологии',8200000,'#f7931a','Крипта',2.4],['ETM','ЭфирКоин','Технологии',280000,'#627eea','Крипта',2.6],['SLNC','СолнцеКоин','Технологии',14000,'#14c9a0','Крипта',3],['DOGY','ДогиКоин','Технологии',18,'#c2a633','Крипта',3.4],['TONX','ТонЭкс','Технологии',520,'#2a96d6','Крипта',2.8],
+['GOLD','Золото, г','Металлы',8400,'#e0b030','Сырьё',.7],['SLVR','Серебро, г','Металлы',105,'#aab4be','Сырьё',1],['OILB','Нефть, барр.','Нефть и газ',6800,'#333c46','Сырьё',1.1],['NGAS','Газ, 1000 м³','Нефть и газ',24,'#4ea0d8','Сырьё',1.3],
+['USDR','Доллар','Банки',92,'#3c9a5a','Валюта',.25],['EURR','Евро','Банки',100,'#3a62b8','Валюта',.25],['CNYR','Юань','Банки',12.8,'#d23c3c','Валюта',.25],
+['IDXR','Индекс рынка','Банки',3200,'#8a63d2','Фонды',.45],['BNDS','Облигации','Банки',1000,'#5f8f6a','Фонды',.12]]
+.map(([t,n,sec,p,c,cat,vl],ix)=>{vl=vl||1;const L=12000,C=[],HI=[],LO=[],V=[],vb=Math.round(5e4+Math.random()*5e5),ph=Math.random()*6,gs=()=>Math.random()+Math.random()+Math.random()-1.5;let x=p;
+for(let i=0;i<L;i++){const o=x,sg=.0016*vl*(.6+.8*Math.abs(Math.sin(i/700+ph)));x=o*(1+gs()*sg*2+(p-o)/p*.0002);C.push(x);HI.push(Math.max(o,x)*(1+Math.random()*.0012));LO.push(Math.min(o,x)*(1-Math.random()*.0012));V.push(Math.round(vb*(.5+Math.random())*(1+Math.abs(x/o-1)*300)))}
 const k=p*(1+(Math.random()-.5)*.06)/C[L-1];for(let i=0;i<L;i++){C[i]*=k;HI[i]*=k;LO[i]*=k}
-return{t,n,sec,c,C,HI,LO,V,vb,base:p,ev:[],t0:Date.now()-L*60000,h:C.slice(-80),imp:0,get p(){return this.h[this.h.length-1]}}});
+return{t,n,sec,c,cat:cat||'Акции',vl,pop:ix<8,C,HI,LO,V,vb,base:p,ev:[],t0:Date.now()-L*60000,h:C.slice(-80),imp:0,get p(){return this.h[this.h.length-1]}}});
 function pushTick(s,pr,np){s.C.push(np);s.HI.push(Math.max(pr,np)*(1+Math.random()*.0012));s.LO.push(Math.min(pr,np)*(1-Math.random()*.0012));s.V.push(Math.round(s.vb*(.5+Math.random())*(1+Math.abs(np/pr-1)*300)))}
 const get=t=>S.find(s=>s.t==t),logo=s=>`<div class=lg style="background:linear-gradient(135deg,${s.c},${s.c}88);border-radius:${{'Банки':'10px','Нефть и газ':'50%','Технологии':'30% 70% 30% 70%','Металлы':'4px','Агро':'40% 10% 40% 10%'}[s.sec]}">${s.t.slice(0,2)}</div>`;
 let G=JSON.parse(localStorage.getItem('farm5')||'null')||{cash:0,pos:{},melons:0,earned:0,age:null,lesson:0,step:0,done:{},quiz:{}};
@@ -159,7 +171,7 @@ const chg=(s,n=10)=>s.p/s.h[s.h.length-1-n]-1;
 const GOOD=['{n} заключила крупный контракт','{n} объявила о росте прибыли','{n} запустила новый популярный продукт'],BAD=['{n} сообщила о падении выручки','У {n} сбой в работе и штрафы','{n} снизила прогноз на год'];
 const SGOOD=['Сектор «{n}»: государство снизило налоги','В секторе «{n}» вырос спрос'],SBAD=['Сектор «{n}»: ужесточились правила','В секторе «{n}» упал спрос'];
 function makeNews(){const good=Math.random()<.5,r=a=>a[Math.random()*a.length|0];let txt,tg;
-if(Math.random()<.65){const s=r(S);tg=[s];txt=r(good?GOOD:BAD).replace('{n}',s.n)}else{const k=r(Object.keys(PEN));tg=S.filter(s=>s.sec==k);txt=r(good?SGOOD:SBAD).replace('{n}',k)}
+if(Math.random()<.65){const s=r(S.filter(x=>x.cat=='Акции'));tg=[s];txt=r(good?GOOD:BAD).replace('{n}',s.n)}else{const k=r(Object.keys(PEN));tg=S.filter(s=>s.sec==k&&s.cat=='Акции');txt=r(good?SGOOD:SBAD).replace('{n}',k)}
 tg.forEach(s=>{s.imp+=good?.004:-.003;s.news={txt,good,ts:Date.now()};s.ev.push({i:s.C.length-1,good,txt})});lastNews=Date.now();G.done.news=1;save();drawList();coach('news',tg);tut()}
 /* ---------- лента выдуманных новостей ---------- */
 const FN=[
@@ -200,7 +212,33 @@ const FN=[
 [['GZPM','LKNF','RSNF'],0,.012,'Цены на нефть и газ резко упали'],
 [['GZPM','LKNF','RSNF'],1,.012,'Мир ищет топливо: нефть и газ дорожают'],
 [['POIS','MBTL'],1,.01,'Государство поддержит технологические компании льготами'],
-[['POIS','MBTL'],0,.01,'Новый закон ограничил доходы технологических компаний']];
+[['POIS','MBTL'],0,.01,'Новый закон ограничил доходы технологических компаний'],
+[['BNKV'],1,.012,'БанкВолга запустил приложение, за неделю пришло 300 тысяч клиентов'],
+[['SIBK'],0,.015,'СибБанк уличили в скрытых комиссиях, клиенты уходят'],
+[['ARKT'],1,.015,'АрктикГаз открыл новый маршрут поставок на восток'],
+[['TATN'],0,.012,'На заводе ТатНедры случился пожар, выпуск сократили'],
+[['CLDS'],1,.02,'ОблакоСофт заключил контракт с крупнейшей сетью магазинов'],
+[['SEMI'],0,.015,'МикроЧип задержал поставки: не хватает материалов'],
+[['GAME'],1,.02,'Новая игра от ИгроМира стала самой скачиваемой в стране'],
+[['ALRS'],0,.012,'Цены на алмазы упали, АлмазТрест снизил прогноз'],
+[['ZLTP'],1,.015,'ЗолотоПром нашёл богатую жилу'],
+[['STLM'],1,.01,'СтальМост выиграл тендер на строительство мостов'],
+[['BTM','ETM','SLNC','DOGY','TONX'],0,.02,'Крупная биржа заморозила вывод денег: паника на рынке криптовалют'],
+[['BTM','ETM','SLNC','DOGY','TONX'],1,.02,'Крупные компании начали принимать криптовалюту к оплате'],
+[['BTM'],1,.03,'Известный инвестор объявил, что купил БитМонеты на миллионы'],
+[['DOGY'],1,.03,'Блогеры устроили волну хайпа вокруг ДогиКоина'],
+[['DOGY'],0,.03,'Создатель ДогиКоина продал свои монеты, цена рухнула'],
+[['SLNC'],0,.02,'В сети СолнцеКоин произошёл сбой, переводы остановлены на сутки'],
+[['ETM'],1,.02,'Сеть ЭфирКоин стала быстрее и дешевле'],
+[['GOLD','SLVR'],1,.008,'В мире тревожно: инвесторы покупают золото и серебро'],
+[['GOLD','SLVR'],0,.007,'Мир успокоился, спрос на золото и серебро упал'],
+[['OILB','NGAS'],0,.01,'Страны договорились нарастить добычу, нефть и газ дешевеют'],
+[['OILB','NGAS'],1,.01,'Холодная зима: газ и нефть дорожают'],
+[['USDR','EURR','CNYR'],1,.004,'Рубль ослаб: валюта дорожает'],
+[['USDR','EURR','CNYR'],0,.004,'Рубль укрепился: валюта дешевеет'],
+[['IDXR'],1,.005,'Рынок в целом растёт: индекс обновил максимум'],
+[['IDXR'],0,.005,'Рынок в целом снижается: индекс упал на тревожных новостях'],
+[['BNDS'],0,.003,'Ставки выросли: цены облигаций слегка просели']];
 let FEED=[],lastFN=-1;
 function fmtHM(t){const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function drawFeed(){const e=$('#nf');if(!e)return;e.innerHTML='<div class=nfh><b>📰 Новости рынка</b></div>'+(FEED.length?FEED.map(f=>`<div class="nfi ${f.good?'g':'r'}"><div><b>${f.tg.join(', ')}</b> <span>${f.good?'▲':'▼'}</span> <small>${fmtHM(f.ts)}</small></div>${f.txt}</div>`).join(''):'<small style="color:var(--mu)">Первая новость скоро появится. Новости выходят в случайное время, до 5 минут между ними.</small>')}
@@ -264,12 +302,22 @@ document.addEventListener('mouseover',e=>{const d=e.target.closest('[data-t]');c
 h.innerHTML='<b>🤔 Подумай:</b><br>'+qs(get(d.dataset.t)).map(x=>'• '+x).join('<br>');h.style.display='block';const r=d.getBoundingClientRect();h.style.left=Math.max(4,Math.min(r.left-250,innerWidth-250))+'px';h.style.top=Math.max(4,Math.min(r.top,innerHeight-h.offsetHeight-8))+'px'});
 /* ---------- список и карточка ---------- */
 function spark(s){const h=s.h.slice(-24),mn=Math.min(...h),mx=Math.max(...h),up=h[h.length-1]>=h[0];return`<polyline fill="none" stroke="${up?'#26a69a':'#ef5350'}" stroke-width="1.8" stroke-linejoin="round" points="${h.map((v,i)=>(i*60/23).toFixed(1)+','+(22-(v-mn)/(mx-mn||1)*20).toFixed(1)).join(' ')}"/>`}
-function drawList(){$('#list').innerHTML=S.map(s=>{const c=chg(s,1)*100;return`<div class="st${G.pos[s.t]?' own':''}" data-t=${s.t}>${logo(s)}<span><b>${s.t}</b><br><small style="color:var(--mu)">${s.n}</small>${G.pos[s.t]?`<br><small class=up>в ферме: ${G.pos[s.t].q} шт</small>`:''}</span><svg class=sp viewBox="0 0 60 24">${spark(s)}</svg><span class=r>${fm(s.p)} ₽<br><span class="pill ${c>=0?'up2':'dn2'}">${c>=0?'▲':'▼'} ${Math.abs(c).toFixed(2)}%</span></span></div>${s.news?`<div class="nw${Date.now()-s.news.ts<2500?' fr':''}">${s.news.good?'🟢':'🔴'} ${s.news.txt}</div>`:''}`}).join('');
+function tabsHtml(){const btn=x=>`<button class="b ${x.t==cur?'':'g'}" data-c=${x.t}>${x.t}</button>`,cn=get(cur);let h=S.filter(x=>x.pop).map(btn).join('');if(!cn.pop)h+=btn(cn);
+h+='<select class=more data-more=1><option value="">Ещё активы…</option>'+CATS.map(c=>{const a=S.filter(x=>!x.pop&&x.cat==c&&x.t!=cur);return a.length?`<optgroup label="${c}">${a.map(x=>`<option value=${x.t}>${x.t} · ${x.n}</option>`).join('')}</optgroup>`:''}).join('')+'</select>';return h}
+const CATS=['Акции','Крипта','Сырьё','Валюта','Фонды'],CI={'Акции':'🏢','Крипта':'🪙','Сырьё':'🛢️','Валюта':'💱','Фонды':'📊'};
+let ML='pop',MQ='';try{ML=localStorage.getItem('farm5_ml')=='all'?'all':'pop'}catch(e){}
+const rowH=s=>{const c=chg(s,1)*100;return`<div class="st${G.pos[s.t]?' own':''}" data-t=${s.t}>${logo(s)}<span><b>${s.t}</b><br><small style="color:var(--mu)">${s.n}</small>${G.pos[s.t]?`<br><small class=up>в ферме: ${G.pos[s.t].q} шт</small>`:''}</span><svg class=sp viewBox="0 0 60 24">${spark(s)}</svg><span class=r>${fm(s.p)} ₽<br><span class="pill ${c>=0?'up2':'dn2'}">${c>=0?'▲':'▼'} ${Math.abs(c).toFixed(2)}%</span></span></div>${s.news?`<div class="nw${Date.now()-s.news.ts<2500?' fr':''}">${s.news.good?'🟢':'🔴'} ${s.news.txt}</div>`:''}`};
+function drawList(){const q=MQ.trim().toLowerCase(),a=ML=='pop'?S.filter(s=>s.pop):S.filter(s=>!q||(s.t+' '+s.n).toLowerCase().includes(q));let h='';
+if(ML=='pop')h=a.map(rowH).join('');else CATS.forEach(c=>{const g=a.filter(s=>s.cat==c);if(g.length)h+=`<div class=lh>${CI[c]} ${c}<small>${g.length}</small></div>`+g.map(rowH).join('')});
+$('#list').innerHTML=h||'<small style="color:var(--mu);padding:8px;display:block">Ничего не найдено</small>'
 $('#hud').innerHTML=`<span>💰 Свободно: <b>${fm(G.cash)} ₽</b></span><span>📊 Всего: <b>${fm(worth())} ₽</b></span><span style="color:var(--mu)">Урок ${Math.min(G.lesson||1,6)}/6</span>`}
+function mtSync(){document.querySelectorAll('#mtab [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m==ML));$('#ms').style.display=ML=='all'?'block':'none'}
+$('#mtab').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;ML=b.dataset.m;try{localStorage.setItem('farm5_ml',ML)}catch(x){}mtSync();drawList();$('#list').scrollTop=0};
+$('#ms').oninput=e=>{MQ=e.target.value;drawList()};mtSync();
 document.addEventListener('click',e=>{const d=e.target.closest('.st');if(d)popup(d.dataset.t,d);else if(popT&&!e.target.closest('#pop,.o,#ai'))closePop()});
 document.addEventListener('pointerdown',e=>{if(popT&&e.target.closest('#ai'))closePop()});
 function popup(t,a){closePop();popT=t;const s=get(t),d=document.createElement('div');d.className='pop';d.id='pop';
-d.innerHTML=`<div style="display:flex;gap:8px;align-items:center">${logo(s)}<b>${s.n}</b><span style="margin-left:auto;cursor:pointer" id=px>✕</span></div><small style="color:var(--mu)">${s.sec}</small><div id=pi></div><div style="margin-top:8px"><input id=bq type=number min=1 value=1 style="width:80px"><button class=b id=bb>Купить</button><button class="b s" id=sb>Продать</button></div><div id=pmsg style="color:#ff7a78;font-size:12px;margin-top:6px"></div>`;
+d.innerHTML=`<div style="display:flex;gap:8px;align-items:center">${logo(s)}<b>${s.n}</b><span style="margin-left:auto;cursor:pointer" id=px>✕</span></div><small style="color:var(--mu)">${s.cat=='Акции'?s.sec:s.cat}</small><div id=pi></div><div style="margin-top:8px"><input id=bq type=number min=1 value=1 style="width:80px"><button class=b id=bb>Купить</button><button class="b s" id=sb>Продать</button></div><div id=pmsg style="color:#ff7a78;font-size:12px;margin-top:6px"></div>`;
 document.body.appendChild(d);$('#tut').style.display='none';const r=a.getBoundingClientRect();d.style.left=Math.max(4,Math.min(r.left<500?r.right+8:r.left-270,innerWidth-270))+'px';d.style.top=Math.max(4,Math.min(r.top,innerHeight-d.offsetHeight-8))+'px';
 $('#px').onclick=closePop;$('#bb').onclick=()=>buy(t,+$('#bq').value);$('#sb').onclick=()=>sell(t,+$('#bq').value);updPop()}
 const closePop=()=>{if($('#pop')){$('#pop').remove();$('#tut').style.display=''}popT=null};
@@ -432,12 +480,13 @@ function syncUI(){const q=s=>document.querySelector(s);document.querySelectorAll
 ['log','pct','magnet'].forEach(k=>{const e=q('#ctb [data-t='+k+']');if(e)e.classList.toggle('on',!!CH[k])});document.querySelectorAll('#imenu [data-i]').forEach(i=>i.checked=!!CH.ind[i.dataset.i]);document.querySelectorAll('#dtb [data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==dt))}
 function finish(){const k=dt;sv();dt='cur';pend=null;syncUI();rq();chartCoach(k)}
 function ui(){const st=$('#stage');
-st.innerHTML='<div class=cw><div class=tabs>'+S.map(x=>`<button class="b ${x.t==cur?'':'g'}" data-c=${x.t}>${x.t}</button>`).join('')+'</div>'+
+st.innerHTML='<div class=cw><div class=tabs>'+tabsHtml()+'</div>'+
 '<div class=ctb id=ctb>'+Object.keys(TFS).map(k=>`<button data-tf=${k}>${k}</button>`).join('')+'<span class=sep></span><select id=ctype>'+TYPES.map(([k,n])=>`<option value=${k}>${n}</option>`).join('')+'</select><span style="position:relative"><button id=ibtn>ƒ Индикаторы ▾</button><div id=imenu>'+INDS.map(([k,n])=>`<label><input type=checkbox data-i=${k}> ${n}</label>`).join('')+'</div></span><span class=sep></span><button data-t=log title="Логарифмическая шкала цены">Лог.</button><button data-t=pct title="Шкала в процентах от начала окна">%</button><button data-t=magnet title="Притягивать точки рисунка к ценам свечи">🧲 Магнит</button><span style="flex:1"></span><button id=creset title="Вернуться к последним свечам">↺ К текущей цене</button><button id=chelp title="Как читать свечу">❓</button></div>'+
 '<div class=cmid><div class=dtb id=dtb>'+TOOLS.map(([k,i,t])=>`<button data-d=${k} title="${t}">${i}</button>`).join('')+'<button data-d=undo title="Отменить последний рисунок">↩</button><button data-d=clear title="Удалить все рисунки">🗑</button></div><div id=cwrap><canvas id=cv></canvas>'+
 '<div id=cinfo><b>🕯 Как читать свечу</b><svg viewBox="0 0 230 130" width="100%"><g stroke-width="2"><line x1="40" y1="15" x2="40" y2="115" stroke="#26a69a"/><line x1="170" y1="15" x2="170" y2="115" stroke="#ef5350"/></g><rect x="28" y="40" width="24" height="50" fill="#26a69a"/><rect x="158" y="35" width="24" height="60" fill="#ef5350"/><g fill="#d1d4dc" font-size="11"><text x="62" y="19">максимум</text><text x="62" y="44">закрытие</text><text x="62" y="94">открытие</text><text x="62" y="119">минимум</text><text x="190" y="39">откр.</text><text x="190" y="99">закр.</text></g></svg><div>Зелёная свеча: цена закрылась выше открытия. Красная: ниже. Тонкие линии (тени) показывают, до каких крайних цен доходила цена за период.</div></div></div></div></div>';
 c=document.getElementById('cv');g=null;syncUI();bind()}
 function bind(){
+$('.cw .tabs').onchange=e=>{const v=e.target.dataset.more&&e.target.value;if(!v)return;cur=v;pend=null;ruler=null;V.right=null;ui();draw();viewCoach('chart')};
 $('.cw .tabs').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;cur=b.dataset.c;pend=null;ruler=null;V.right=null;ui();draw();viewCoach('chart')};
 $('#ctb').onclick=e=>{const b=e.target.closest('button');if(!b)return;
 if(b.dataset.tf){CH.tf=b.dataset.tf;V.right=null;chartCoach('tf')}
@@ -472,7 +521,7 @@ function chart(){chartApi.show()}
 
 /* ---------- стакан ---------- */
 const bookApi=(()=>{
-const N=160,stOf=p=>p<100?.02:p<500?.05:p<1000?.1:p<5000?.5:1,cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+const N=160,stOf=p=>p<100?.02:p<500?.05:p<1000?.1:p<5000?.5:p<1e5?1:p<1e6?10:100,cl=(x,a,b)=>Math.max(a,Math.min(b,x));
 let GR=1,LV=8,side='buy',qty=60,R=0,lastCo=0,lastPr=0,tm=0;
 function init(s){const st=stOf(s.p);if(s.q&&s.qs===st)return;s.qs=st;s.q={};s.w={};s.sp=s.sp||1;s.bq=cl((s.vb||1e5)/2500,15,200);s.tape=s.tape||[];fill(s,1)}
 function fill(s,first){const st=s.qs,kb=Math.floor(s.p/st),ka=kb+s.sp,bias=cl(1+s.imp*60,.6,1.6);
@@ -497,7 +546,7 @@ wall:y=>y?'Строка с 🧱 — на этом уровне очень мно
 imb:y=>y?'Одна сторона стакана заметно длиннее другой. Значит ли это, что цена обязательно пойдёт туда же? Что ещё стоит проверить?':'Перекос стакана — не прогноз. Что ещё нужно посмотреть, кроме объёмов заявок, прежде чем делать вывод?'};
 const cs=(k,f)=>say(k,TX[k]((G.age||0)==0),f);
 function show(){const s=get(cur);init(s);R=0;
-$('#stage').innerHTML=`<div class=bkw><div class=tabs>${S.map(x=>`<button class="b ${x.t==cur?'':'g'}" data-c=${x.t}>${x.t}</button>`).join('')}</div>
+$('#stage').innerHTML=`<div class=bkw><div class=tabs>${tabsHtml()}</div>
 <div class=bkh><div><div class=bkn>${s.n}</div><div><b id=bkpr></b> <span id=bkch></span></div></div><div class=bksp id=bksp></div></div>
 <div class=bkim><i id=bkib></i><span id=bkit></span></div>
 <div class=bkg><div><div class=bkc><span>Шаг цены</span>${[1,5,10].map(x=>`<button data-gr=${x} class="${x==GR?'on':''}">×${x}</button>`).join('')}<span>Строк</span>${[5,8,12].map(x=>`<button data-lv=${x} class="${x==LV?'on':''}">${x}</button>`).join('')}</div>
@@ -508,6 +557,7 @@ $('#stage').innerHTML=`<div class=bkw><div class=tabs>${S.map(x=>`<button class=
 const row=c=>`<div class="bkrow ${c}"><i></i><span class=p></span><span class=q></span><span class=c></span></div>`;
 $('#bka').innerHTML=row('ra').repeat(LV);$('#bkb').innerHTML=row('rb').repeat(LV);
 const w=$('.bkw');
+w.onchange=e=>{const v=e.target.dataset.more&&e.target.value;if(v){cur=v;show();viewCoach('book')}};
 w.onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
 if(d.c){cur=d.c;show();viewCoach('book')}
 else if(d.gr){GR=+d.gr;show();cs('group',1)}
@@ -595,7 +645,7 @@ setInterval(()=>{MP.p=Math.max(70,Math.min(180,MP.p+(120-MP.p)*.1+(Math.random()
 function render(){closePop();({farm:buildField,chart,book})[view]()}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v,need={chart:4,book:5}[v]||0;
 view=v;document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x==b));$('#stage').innerHTML='';render();if(v=='farm'){vmsg=0;tut(true);aiMove()}else{viewCoach(v);if(v=='chart')mark('chart');if(v=='book')mark('book')}}
-setInterval(()=>{S.forEach(s=>{const pr=s.p,np=pr*(1+(Math.random()-.5)*.006+.0001+(s.base/pr-1)*.002+s.imp);s.h.push(np);s.h.shift();pushTick(s,pr,np);bookApi.step(s);s.imp*=.93});drawList();updPop();if(view=='farm')updFarm();else if(view=='chart')chart();else if(view=='book')bookApi.update()},2000);
+setInterval(()=>{S.forEach(s=>{const pr=s.p,np=pr*(1+(Math.random()-.5)*.006*s.vl+.0001+(s.base/pr-1)*.002+s.imp);s.h.push(np);s.h.shift();pushTick(s,pr,np);bookApi.step(s);s.imp*=.93});drawList();updPop();if(view=='farm')updFarm();else if(view=='chart')chart();else if(view=='book')bookApi.update()},2000);
 setInterval(()=>{if(G.lesson>=3&&(!G.done.news||Date.now()-lastNews>25000))makeNews()},4000);
 drawList();updNav();render();tut();
 </script></body></html>
