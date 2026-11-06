@@ -203,7 +203,7 @@ const FN=[
 [['POIS','MBTL'],0,.01,'Новый закон ограничил доходы технологических компаний']];
 let FEED=[],lastFN=-1;
 function fmtHM(t){const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
-function drawFeed(){const e=$('#nf');if(!e)return;e.innerHTML='<div class=nfh><b>📰 Новости рынка</b><small>выдуманные</small></div>'+(FEED.length?FEED.map(f=>`<div class="nfi ${f.good?'g':'r'}"><div><b>${f.tg.join(', ')}</b> <span>${f.good?'▲':'▼'}</span> <small>${fmtHM(f.ts)}</small></div>${f.txt}</div>`).join(''):'<small style="color:var(--mu)">Первая новость скоро появится. Новости выходят в случайное время, до 5 минут между ними.</small>')}
+function drawFeed(){const e=$('#nf');if(!e)return;e.innerHTML='<div class=nfh><b>📰 Новости рынка</b></div>'+(FEED.length?FEED.map(f=>`<div class="nfi ${f.good?'g':'r'}"><div><b>${f.tg.join(', ')}</b> <span>${f.good?'▲':'▼'}</span> <small>${fmtHM(f.ts)}</small></div>${f.txt}</div>`).join(''):'<small style="color:var(--mu)">Первая новость скоро появится. Новости выходят в случайное время, до 5 минут между ними.</small>')}
 function feedNews(){let i;do{i=Math.random()*FN.length|0}while(i==lastFN&&FN.length>1);lastFN=i;const[tk,g,m,txt]=FN[i],good=!!g,tg=tk.map(get).filter(Boolean);
 tg.forEach(s=>{s.imp+=(good?1:-1)*m*(.85+Math.random()*.3);s.news={txt,good,ts:Date.now()};s.ev.push({i:s.C.length-1,good,txt})});
 FEED.unshift({tg:tk,good,txt,ts:Date.now()});if(FEED.length>8)FEED.length=8;drawFeed();drawList();if(G.age!==null)coach('news',tg)}
